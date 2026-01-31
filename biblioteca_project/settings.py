@@ -90,7 +90,7 @@ DATABASES = {
     }
 }
 
-MONGODB_URI = "mongodb+srv://biblioteca_admin:Biblioteca2026!@cluster0.gtao6h1.mongodb.net/?appName=Cluster0"
+MONGODB_URI = config("MONGODB_URI")
 MONGODB_CONNECTION_STRING = MONGODB_URI
 MONGODB_DATABASE_NAME = "biblioteca_logs"
 
