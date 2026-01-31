@@ -1,0 +1,131 @@
+{% extends 'biblioteca/base.html' %}
+
+{% block title %}Dashboard del Sistema{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="mb-4">📊 Dashboard de Control Híbrido</h1>
+
+    <h3 class="mb-3">📚 Estado de la Biblioteca (MySQL)</h3>
+    <div class="row mb-5">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white text-center">
+                <div class="card-body">
+                    <h2 class="display-4">{{ total_libros }}</h2>
+                    <p class="card-text">Libros Registrados</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white text-center">
+                <div class="card-body">
+                    <h2 class="display-4">{{ libros_disponibles }}</h2>
+                    <p class="card-text">Libros Disponibles</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-dark text-center">
+                <div class="card-body">
+                    <h2 class="display-4">{{ total_prestamos_activos }}</h2>
+                    <p class="card-text">Préstamos Activos</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white text-center">
+                <div class="card-body">
+                    <h2 class="display-4">{{ total_prestamos_historico }}</h2>
+                    <p class="card-text">Histórico Total</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr class="my-5">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3>🍃 Métricas NoSQL (MongoDB)</h3>
+        {% if mongodb_stats.mongodb_conectado %}
+            <span class="badge bg-success">🟢 Conectado</span>
+        {% else %}
+            <span class="badge bg-danger">🔴 Desconectado</span>
+        {% endif %}
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-dark text-white">Distribución de Colecciones</div>
+                <div class="card-body">
+                    <canvas id="chartMongo"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-dark text-white">Detalle de Almacenamiento</div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Logs de Actividad
+                            <span class="badge bg-secondary rounded-pill">{{ mongodb_stats.logs_count }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Documentos de Catálogo
+                            <span class="badge bg-secondary rounded-pill">{{ mongodb_stats.libros_count }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Estadísticas Agregadas
+                            <span class="badge bg-secondary rounded-pill">{{ mongodb_stats.estadisticas_count }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Perfiles de Usuario
+                            <span class="badge bg-secondary rounded-pill">{{ mongodb_stats.usuarios_count }}</span>
+                        </li>
+                    </ul>
+                    <div class="mt-4 text-center">
+                        <h5>Total Documentos: <strong>{{ mongodb_stats.total_documentos }}</strong></h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('chartMongo').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Logs', 'Catálogo', 'Estadísticas', 'Usuarios'],
+                datasets: [{
+                    data: [
+                        {{ mongodb_stats.logs_count }},
+                        {{ mongodb_stats.libros_count }},
+                        {{ mongodb_stats.estadisticas_count }},
+                        {{ mongodb_stats.usuarios_count }}
+                    ],
+                    backgroundColor: [
+                        '#6c757d',
+                        '#28a745',
+                        '#ffc107',
+                        '#17a2b8'
+                    ],
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

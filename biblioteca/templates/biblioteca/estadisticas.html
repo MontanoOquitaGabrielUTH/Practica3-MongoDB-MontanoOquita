@@ -1,0 +1,141 @@
+{% extends 'biblioteca/base.html' %}
+
+{% block title %}Estadísticas del Sistema{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">📊 Dashboard de Estadísticas</h1>
+
+<!-- Resumen General -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <h2 style="color: #f093fb;">{{ total_libros }}</h2>
+                <p class="text-muted">Total Libros (MySQL)</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <h2 style="color: #f5576c;">{{ total_stock }}</h2>
+                <p class="text-muted">Stock Total</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <h2 style="color: #667eea;">{{ total_views }}</h2>
+                <p class="text-muted">Vistas Totales (MongoDB)</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Gráficas -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5>👁️ Top 10 Más Vistos</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="chartVistos"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5>📚 Top 10 Más Prestados</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="chartPrestados"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Actividad Reciente -->
+<div class="card">
+    <div class="card-header bg-warning">
+        <h5>📝 Actividad Reciente (MongoDB Logs)</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Acción</th>
+                        <th>Libro</th>
+                        <th>Fecha y Hora</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in logs_recientes %}
+                        <tr>
+                            <td>
+                                {% if log.accion == 'crear_libro' %}
+                                    <span class="badge bg-success">➕ Crear</span>
+                                {% elif log.accion == 'ver_detalle' %}
+                                    <span class="badge bg-info">👁️ Ver</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ log.libro_titulo|default:"N/A" }}</td>
+                            <td><small>{{ log.timestamp|date:"d/m/Y H:i:s" }}</small></td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="3" class="text-center text-muted">No hay actividad registrada</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+// Datos para gráfica de libros más vistos
+const dataVistos = {
+    labels: [
+        {% for libro in top_vistos %}
+            '{{ libro.titulo|truncatechars:30 }}'{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ],
+    datasets: [{
+        label: 'Vistas',
+        data: [
+            {% for libro in top_vistos %}
+                {{ libro.views|default:0 }}{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ],
+        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+        borderColor: 'rgba(54, 162, 235, 1)',
+        borderWidth: 2
+    }]
+};
+
+// Crear gráfica
+const ctxVistos = document.getElementById('chartVistos');
+if (ctxVistos) {
+    new Chart(ctxVistos, {
+        type: 'bar',
+        data: dataVistos,
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+</script>
+
+{% endblock %}

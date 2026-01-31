@@ -1,0 +1,92 @@
+{% extends 'biblioteca/base.html' %}
+
+{% block title %}Inicio - Sistema Biblioteca{% endblock %}
+
+{% block content %}
+<div class="text-center mb-5">
+    <h1 class="display-3">📚 Bienvenido al Sistema de Biblioteca</h1>
+    <p class="lead text-muted">Sistema Híbrido MySQL + MongoDB</p>
+</div>
+
+<!-- Estadísticas Generales -->
+<div class="row mb-5">
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <h2 style="color: #f093fb; font-size: 3em;">{{ total_libros_mysql }}</h2>
+                <p class="text-muted">Libros en MySQL</p>
+                <small class="badge bg-info">Base de Datos SQL</small>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <h2 style="color: #f5576c; font-size: 3em;">{{ total_libros_mongo }}</h2>
+                <p class="text-muted">Documentos en MongoDB</p>
+                <small class="badge bg-success">Base de Datos NoSQL</small>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <h2 style="color: #667eea; font-size: 3em;">2</h2>
+                <p class="text-muted">Bases de Datos Activas</p>
+                <small class="badge bg-warning text-dark">Sistema Híbrido</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Top Libros Más Vistos -->
+<div class="card mb-4">
+    <div class="card-header" style="background: linear-gradient(90deg, #f093fb, #f5576c); color: white;">
+        <h3>🔥 Top 5 Libros Más Vistos</h3>
+    </div>
+    <div class="card-body">
+        {% if top_libros %}
+            <div class="list-group">
+                {% for libro in top_libros %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5>{{ forloop.counter }}. {{ libro.titulo }}</h5>
+                            <small class="text-muted">Libro ID: {{ libro.libro_id }}</small>
+                        </div>
+                        <span class="badge bg-primary rounded-pill">👁️ {{ libro.views }} vistas</span>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-muted text-center">No hay datos de estadísticas aún</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Acciones Rápidas -->
+<div class="row">
+    <div class="col-md-6 mb-3">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <div style="font-size: 4em; margin-bottom: 20px;">📖</div>
+                <h4>Ver Catálogo</h4>
+                <p class="text-muted">Explora todos los libros disponibles</p>
+                <a href="{% url 'listar_libros' %}" class="btn btn-primary">Ir al Catálogo</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 mb-3">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <div style="font-size: 4em; margin-bottom: 20px;">📊</div>
+                <h4>Ver Estadísticas</h4>
+                <p class="text-muted">Dashboard con métricas y gráficas</p>
+                <a href="{% url 'estadisticas' %}" class="btn btn-primary">Ver Dashboard</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

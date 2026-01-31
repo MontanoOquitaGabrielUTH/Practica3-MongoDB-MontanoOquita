@@ -1,0 +1,76 @@
+{% extends 'biblioteca/base.html' %}
+
+{% block title %}Listado de Libros{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>📚 Listado de Libros</h1>
+        <a href="{% url 'crear_libro' %}" class="btn btn-success">
+            <i class="fas fa-plus"></i> Agregar Nuevo Libro
+        </a>
+    </div>
+
+    <!-- Barra de búsqueda -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" action="{% url 'listar_libros' %}">
+                <div class="input-group">
+                    <input type="text" class="form-control" name="q" value="{{ query }}" 
+                           placeholder="Buscar por título o autor...">
+                    <button class="btn btn-primary" type="submit">
+                        <i class="fas fa-search"></i> Buscar
+                    </button>
+                    {% if query %}
+                        <a href="{% url 'listar_libros' %}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Limpiar
+                        </a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Lista de libros -->
+    {% if libros %}
+        <div class="row">
+            {% for libro in libros %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title text-primary">{{ libro.titulo }}</h5>
+                            <p class="card-text">
+                                <strong>Autor:</strong> {{ libro.autor }}<br>
+                                <strong>ISBN:</strong> {{ libro.isbn }}<br>
+                                <strong>Precio:</strong> ${{ libro.precio }}<br>
+                                <strong>Stock:</strong> {{ libro.stock }} unidades
+                            </p>
+                            
+                            {% if libro.stock > 0 %}
+                                <span class="badge bg-success">Disponible</span>
+                            {% else %}
+                                <span class="badge bg-danger">No Disponible</span>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="card-footer bg-transparent">
+                            <div class="btn-group w-100" role="group">
+                                <a href="{% url 'detalle_libro' libro.id %}" class="btn btn-sm btn-outline-primary">Ver</a>
+                                <a href="{% url 'editar_libro' libro.id %}" class="btn btn-sm btn-outline-secondary">Editar</a>
+                                <a href="{% url 'eliminar_libro' libro.id %}" class="btn btn-sm btn-outline-danger">Eliminar</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-warning text-center">
+            <h4>No se encontraron libros</h4>
+            <a href="{% url 'crear_libro' %}" class="btn btn-success">Agregar Primer Libro</a>
+        </div>
+    {% endif %}
+</div>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+{% endblock %}

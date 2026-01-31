@@ -1,0 +1,85 @@
+{% extends 'biblioteca/base.html' %}
+
+{% block title %}{{ libro.titulo }} - Detalle{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <a href="{% url 'listar_libros' %}" class="btn btn-outline-secondary">← Volver al Catálogo</a>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header" style="background: linear-gradient(90deg, #f093fb, #f5576c); color: white;">
+                <h2>📖 {{ libro.titulo }}</h2>
+            </div>
+            <div class="card-body">
+                <table class="table table-borderless">
+                    <tbody>
+                        <tr>
+                            <th width="200">📝 Título:</th>
+                            <td><strong>{{ libro.titulo }}</strong></td>
+                        </tr>
+                        <tr>
+                            <th>✍️ Autor:</th>
+                            <td>{{ libro.autor }}</td>
+                        </tr>
+                        <tr>
+                            <th>🔢 ISBN:</th>
+                            <td><code>{{ libro.isbn }}</code></td>
+                        </tr>
+                        <tr>
+                            <th>📅 Fecha Publicación:</th>
+                            <td>{{ libro.fecha_publicacion }}</td>
+                        </tr>
+                        <tr>
+                            <th>💰 Precio:</th>
+                            <td><span class="badge bg-success">${{ libro.precio }}</span></td>
+                        </tr>
+                        <tr>
+                            <th>📦 Stock:</th>
+                            <td>
+                                {% if libro.stock > 0 %}
+                                    <span class="badge bg-info">{{ libro.stock }} unidades</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Agotado</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                {% if libro.descripcion %}
+                    <hr>
+                    <h5>📄 Descripción:</h5>
+                    <p>{{ libro.descripcion }}</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="mt-4">
+            <a href="{% url 'editar_libro' libro.id %}" class="btn btn-primary">✏️ Editar Libro</a>
+            <a href="{% url 'eliminar_libro' libro.id %}" class="btn btn-danger">🗑️ Eliminar Libro</a>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card mb-3">
+            <div class="card-header bg-info text-white">
+                <h5>📊 Estadísticas (MongoDB)</h5>
+            </div>
+            <div class="card-body text-center">
+                <div class="mb-3">
+                    <h2 style="color: #f093fb;">{{ views }}</h2>
+                    <p class="text-muted">👁️ Vistas Totales</p>
+                </div>
+                
+                <div>
+                    <h2 style="color: #f5576c;">{{ prestamos }}</h2>
+                    <p class="text-muted">📚 Préstamos Realizados</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

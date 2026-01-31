@@ -1,0 +1,40 @@
+{% extends 'biblioteca/base.html' %}
+
+{% block title %}Eliminar Libro{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card border-danger shadow">
+            <div class="card-header bg-danger text-white">
+                <h4 class="mb-0">⚠️ Confirmar Eliminación</h4>
+            </div>
+            <div class="card-body">
+                <p>Estás a punto de eliminar permanentemente el siguiente libro de <strong>MySQL</strong>:</p>
+                
+                <div class="alert alert-secondary">
+                    <h5>{{ libro.titulo }}</h5>
+                    <p class="mb-0 text-muted">Autor: {{ libro.autor }} | ISBN: {{ libro.isbn }}</p>
+                </div>
+
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="motivo" class="form-label"><strong>Motivo de la eliminación:</strong></label>
+                        <textarea class="form-control" name="motivo" id="motivo" rows="2" placeholder="Ej. Dañado, pérdida, descatalogado..." required></textarea>
+                        <div class="form-text text-info">
+                            ℹ️ Esta información se archivará en la auditoría de MongoDB.
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'detalle_libro' libro.id %}" class="btn btn-outline-secondary">Cancelar</a>
+                        <button type="submit" class="btn btn-danger">Confirmar Eliminación Permanente</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
