@@ -1,0 +1,67 @@
+{% extends 'biblioteca/base.html' %}
+
+{% block title %}Mis Préstamos{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1>📚 Mis Préstamos</h1>
+    </div>
+</div>
+
+<div class="alert alert-info">
+    Total de préstamos: <strong>{{ total_prestamos }}</strong>
+</div>
+
+<div class="row">
+    {% for prestamo in prestamos %}
+    <div class="col-md-6 mb-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-header" 
+                 {% if prestamo.estado == 'ACTIVO' %}
+                     style="background-color: #28a745; color: white;"
+                 {% else %}
+                     style="background-color: #6c757d; color: white;"
+                 {% endif %}>
+                <strong>Préstamo #{{ prestamo.id }}</strong>
+                <span class="badge bg-light text-dark float-end">{{ prestamo.estado }}</span>
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">{{ prestamo.libro.titulo }}</h5>
+                <p class="mb-1">
+                    <strong>Autor:</strong> {{ prestamo.libro.autor }}
+                </p>
+                <p class="mb-1">
+                    <strong>Fecha préstamo:</strong> 
+                    {{ prestamo.fecha_prestamo|date:"d/m/Y H:i" }}
+                </p>
+                {% if prestamo.fecha_devolucion %}
+                <p class="mb-1">
+                    <strong>Fecha devolución:</strong> 
+                    {{ prestamo.fecha_devolucion|date:"d/m/Y H:i" }}
+                </p>
+                {% endif %}
+            </div>
+            
+            {% if prestamo.estado == 'ACTIVO' %}
+            <div class="card-footer">
+                <form method="POST" action="{% url 'devolver_libro' prestamo.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-warning w-100">
+                        Devolver Libro
+                    </button>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="alert alert-warning text-center">
+            <h4>📭 No tienes préstamos registrados</h4>
+            <a href="{% url 'listar_libros' %}" class="btn btn-primary">Ver Catálogo</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

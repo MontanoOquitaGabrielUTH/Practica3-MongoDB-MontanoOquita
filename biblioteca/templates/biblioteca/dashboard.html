@@ -1,92 +1,134 @@
 {% extends 'biblioteca/base.html' %}
 
-{% block title %}Dashboard del Sistema{% endblock %}
+{% block title %}Dashboard - Sistema Biblioteca{% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-    <h1 class="mb-4">📊 Dashboard de Control Híbrido</h1>
+<div class="container mt-4">
+    <h1 class="mb-4">
+        <i class="fas fa-chart-line"></i> Panel de Control
+    </h1>
 
-    <h3 class="mb-3">📚 Estado de la Biblioteca (MySQL)</h3>
-    <div class="row mb-5">
-        <div class="col-md-3">
-            <div class="card bg-primary text-white text-center">
-                <div class="card-body">
-                    <h2 class="display-4">{{ total_libros }}</h2>
-                    <p class="card-text">Libros Registrados</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card bg-success text-white text-center">
-                <div class="card-body">
-                    <h2 class="display-4">{{ libros_disponibles }}</h2>
-                    <p class="card-text">Libros Disponibles</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card bg-warning text-dark text-center">
-                <div class="card-body">
-                    <h2 class="display-4">{{ total_prestamos_activos }}</h2>
-                    <p class="card-text">Préstamos Activos</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card bg-info text-white text-center">
-                <div class="card-body">
-                    <h2 class="display-4">{{ total_prestamos_historico }}</h2>
-                    <p class="card-text">Histórico Total</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <hr class="my-5">
-
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h3>🍃 Métricas NoSQL (MongoDB)</h3>
-        {% if mongodb_stats.mongodb_conectado %}
-            <span class="badge bg-success">🟢 Conectado</span>
-        {% else %}
-            <span class="badge bg-danger">🔴 Desconectado</span>
-        {% endif %}
-    </div>
-
+    <!-- Tarjetas de Estadísticas -->
     <div class="row mb-4">
-        <div class="col-md-6">
-            <div class="card h-100">
-                <div class="card-header bg-dark text-white">Distribución de Colecciones</div>
+        <div class="col-md-3">
+            <div class="card text-white bg-primary mb-3">
                 <div class="card-body">
-                    <canvas id="chartMongo"></canvas>
+                    <h5 class="card-title">
+                        <i class="fas fa-book"></i> Total Libros
+                    </h5>
+                    <h2 class="card-text">{{ total_libros }}</h2>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-6">
-            <div class="card h-100">
-                <div class="card-header bg-dark text-white">Detalle de Almacenamiento</div>
+        <div class="col-md-3">
+            <div class="card text-white bg-success mb-3">
                 <div class="card-body">
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            Logs de Actividad
-                            <span class="badge bg-secondary rounded-pill">{{ mongodb_stats.logs_count }}</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            Documentos de Catálogo
-                            <span class="badge bg-secondary rounded-pill">{{ mongodb_stats.libros_count }}</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            Estadísticas Agregadas
-                            <span class="badge bg-secondary rounded-pill">{{ mongodb_stats.estadisticas_count }}</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            Perfiles de Usuario
-                            <span class="badge bg-secondary rounded-pill">{{ mongodb_stats.usuarios_count }}</span>
-                        </li>
-                    </ul>
-                    <div class="mt-4 text-center">
-                        <h5>Total Documentos: <strong>{{ mongodb_stats.total_documentos }}</strong></h5>
+                    <h5 class="card-title">
+                        <i class="fas fa-check-circle"></i> Disponibles
+                    </h5>
+                    <h2 class="card-text">{{ libros_disponibles }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card text-white bg-warning mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-hand-holding"></i> Préstamos Activos
+                    </h5>
+                    <h2 class="card-text">{{ total_prestamos_activos }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card text-white bg-info mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-history"></i> Total Préstamos
+                    </h5>
+                    <h2 class="card-text">{{ total_prestamos_historico }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Acciones Rápidas -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h5><i class="fas fa-bolt"></i> Acciones Rápidas</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <a href="{% url 'listar_libros' %}" class="btn btn-primary btn-lg w-100">
+                                <i class="fas fa-list"></i> Ver Todos los Libros
+                            </a>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <a href="{% url 'crear_libro' %}" class="btn btn-success btn-lg w-100">
+                                <i class="fas fa-plus"></i> Agregar Nuevo Libro
+                            </a>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <a href="/admin/" class="btn btn-info btn-lg w-100">
+                                <i class="fas fa-cog"></i> Panel de Administración
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Información del Sistema -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h5><i class="fas fa-database"></i> Estadísticas de Bases de Datos</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-server"></i> MySQL (Relacional)</h6>
+                            <ul class="list-group">
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <strong>Libros</strong>
+                                    <span class="badge bg-primary">{{ total_libros }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <strong>Estado</strong>
+                                    <span class="badge bg-success">✅ Conectado</span>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-leaf"></i> MongoDB (NoSQL)</h6>
+                            {% if mongodb_stats.mongodb_conectado %}
+                            <ul class="list-group">
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <strong>Logs</strong>
+                                    <span class="badge bg-warning text-dark">{{ mongodb_stats.logs_count }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <strong>Total Documentos</strong>
+                                    <span class="badge bg-primary">{{ mongodb_stats.total_documentos }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <strong>Estado</strong>
+                                    <span class="badge bg-success">✅ Conectado</span>
+                                </li>
+                            </ul>
+                            {% else %}
+                            <div class="alert alert-warning">MongoDB no disponible</div>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -94,38 +136,57 @@
     </div>
 </div>
 
+<canvas id="graficaPrestamos" width="400" height="200"></canvas>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const ctx = document.getElementById('chartMongo').getContext('2d');
-        new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Logs', 'Catálogo', 'Estadísticas', 'Usuarios'],
-                datasets: [{
-                    data: [
-                        {{ mongodb_stats.logs_count }},
-                        {{ mongodb_stats.libros_count }},
-                        {{ mongodb_stats.estadisticas_count }},
-                        {{ mongodb_stats.usuarios_count }}
-                    ],
-                    backgroundColor: [
-                        '#6c757d',
-                        '#28a745',
-                        '#ffc107',
-                        '#17a2b8'
-                    ],
-                    hoverOffset: 4
-                }]
+    // Configuración de Chart.js para mostrar estadísticas de préstamos
+const ctx = document.getElementById('graficaPrestamos').getContext('2d');
+
+const dataPrestamos = {
+    labels: [
+        'Enero', 'Febrero', 'Marzo', 'Abril', 
+        'Mayo', 'Junio', 'Julio'
+    ],
+    datasets: [{
+        label: 'Préstamos Activos',
+        data: [12, 19, 15, 25, 22, 30, 28],
+        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+        borderColor: 'rgba(54, 162, 235, 1)',
+        borderWidth: 2
+    }, {
+        label: 'Préstamos Devueltos',
+        data: [8, 15, 12, 20, 18, 25, 23],
+        backgroundColor: 'rgba(75, 192, 192, 0.5)',
+        borderColor: 'rgba(75, 192, 192, 1)',
+        borderWidth: 2
+    }]
+};
+
+const config = {
+    type: 'bar',
+    data: dataPrestamos,
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'top',
             },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                    }
-                }
+            title: {
+                display: true,
+                text: 'Estadísticas de Préstamos Mensuales'
             }
-        });
-    });
+        },
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+};
+
+const graficaPrestamos = new Chart(ctx, config);
 </script>
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 {% endblock %}

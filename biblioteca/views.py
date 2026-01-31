@@ -332,51 +332,45 @@ def editar_libro(request, libro_id):
 # VISTA: Eliminar Libro
 # ========================================
 def eliminar_libro(request, libro_id):
-    """
-    Elimina un libro del sistema MySQL.
-    Archiva en MongoDB para auditoría.
-    """
     libro = get_object_or_404(Libro, id=libro_id)
 
     if request.method == 'POST':
         titulo = libro.titulo
-
         try:
-            # Archivar en MongoDB antes de eliminar
-            try:
-                client = settings.MONGO_CLIENT
-                db_logs = client['biblioteca_logs']
-                
-                db_logs.libros_eliminados.insert_one({
-                    'libro_id': libro_id,
-                    'titulo': titulo,
-                    'autor': libro.autor,
-                    'isbn': libro.isbn,
-                    'fecha_eliminacion': datetime.now(),
-                    'motivo': request.POST.get('motivo', 'No especificado')
-                })
-            except:
-                pass
-            
-            # Eliminar de MySQL
-            libro.delete()
+            client = settings.MONGO_CLIENT
+            id_busqueda = int(libro_id)
 
-            # Registrar en logs
-            log_to_mongodb('logs', {
-                'accion': 'eliminar_libro',
-                'libro_id': libro_id,
-                'libro_titulo': titulo,
-                'timestamp': datetime.now()
+            # 1. PASO A ELIMINADOS: Insertar en la colección de auditoría
+            db_logs = client['biblioteca_logs']
+            db_logs.libros_eliminados.insert_one({
+                'libro_id': id_busqueda,
+                'titulo': titulo,
+                'autor': str(libro.autor),
+                'isbn': libro.isbn,
+                'fecha_eliminacion': datetime.now(),
+                'motivo': request.POST.get('motivo', 'No especificado')
             })
 
-            messages.success(request, f'Libro "{titulo}" eliminado correctamente')
+            # 2. QUITAR DE LIBROS: Borrar de la colección activa en catálogo
+            # Esto hace que ya no aparezca en las búsquedas de MongoDB
+            client['biblioteca_catalogo'].libros.delete_one({'libro_id': id_busqueda})
+            
+            # 3. OPCIONAL: Quitar también de estadísticas si no quieres rastrearlo más
+            client['biblioteca_estadisticas'].estadisticas.delete_one({'libro_id': id_busqueda})
+
+            print(f"✅ Libro {id_busqueda} movido a 'eliminados' y quitado de 'catalogo'.")
+
+            # 4. ELIMINAR DE MYSQL: El paso final
+            libro.delete()
+
+            messages.success(request, f'Libro "{titulo}" movido al archivo de eliminados.')
             return redirect('listar_libros')
 
         except Exception as e:
-            messages.error(request, f'Error al eliminar: {str(e)}')
+            print(f"❌ Error al mover datos: {e}")
+            messages.error(request, f'Error en el proceso: {str(e)}')
 
-    context = {'libro': libro}
-    return render(request, 'biblioteca/confirmar_eliminacion.html', context)
+    return render(request, 'biblioteca/confirmar_eliminacion.html', {'libro': libro})
 
 # ========================================
 # VISTA: Estadísticas

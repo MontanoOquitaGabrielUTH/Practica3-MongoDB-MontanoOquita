@@ -1,0 +1,42 @@
+{% extends 'biblioteca/base.html' %}
+
+{% block title %}Registrar Préstamo{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-gradient" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                <h2 class="text-white mb-0">📚 Registrar Nuevo Préstamo</h2>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="libro_id" class="form-label">Libro ID</label>
+                        <input type="text" class="form-control" id="libro_id" name="libro_id" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="usuario" class="form-label">Usuario</label>
+                        <input type="text" class="form-control" id="usuario" name="usuario" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="fecha_prestamo" class="form-label">Fecha de Préstamo</label>
+                        <input type="date" class="form-control" id="fecha_prestamo" name="fecha_prestamo" required>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            💾 Registrar Préstamo
+                        </button>
+                        <a href="{% url 'mis_prestamos' %}" class="btn btn-secondary">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
